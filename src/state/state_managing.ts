@@ -24,8 +24,9 @@ function compose_state_key(user_id: string): string {
     return `state_metadata:${user_id}`
 }
 
-export async function reset_state(user_id: string) {
-    set_state(user_id, DEFAULT_STATE)
+export async function reset_state(user_id: string): Promise<IState> {
+    await set_state(user_id, DEFAULT_STATE)
+    return DEFAULT_STATE
 }
 
 export async function set_state(user_id: string, state: IState) {

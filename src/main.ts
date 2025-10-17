@@ -62,8 +62,7 @@ async function run() {
         "message_chat_created"
     ], async (ctx) => {
         if (!ctx.currentState) {
-            await ctx.reply(format(lang.CURRENT_STATE_ERROR, {"ctx": ctx}))
-            return
+            ctx.currentState = await reset_state(ctx.user!.user_id.toString())
         }
         await ctx.reply(`${JSON.stringify(ctx.currentState.metadata)}`)
         setTimeout(async () => {
