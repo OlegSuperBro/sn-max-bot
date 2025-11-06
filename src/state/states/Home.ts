@@ -1,26 +1,53 @@
-import IState, { cloneState } from "../IState";
-import SettingsState from "./Settings"
+import IState from "../IState";
+import { Keyboard } from "@maxhub/max-bot-api";
+import lang from "@/strings/ru.json"
 
-let state: IState = {
+import { SupportsList } from "./SupportsList"
+import { getSupports } from "@/services/api";
+
+enum payloads {
+    ALL_SUPPORTS = "all_supports"
+}
+
+let state: IState<{}> = {
     state_id: "home",
-    active_on: "all",
-    metadata: {},
-    process_state(ctx, metadata) {
-        console.log("Hey, i'm at home")
+    active_on: "message_callback",
+    async process_state(ctx) {
+        const button_payload = ctx.callback?.payload
 
-        ctx.reply(`Switching to settings ${metadata.super_valuable_data}`)
-
-        let next_state: IState = cloneState(SettingsState)
-
-        if (!metadata.super_valuable_data) {
-            metadata.super_valuable_data = 0
+        if (ctx.metadata.sent && !button_payload) {
+            return state
         }
 
-        metadata.super_valuable_data += 1
+        if (button_payload === payloads.ALL_SUPPORTS) {
+            ctx.metadata = {}
 
-        next_state.metadata = metadata
+            const supports = (await getSupports({
+                limit: 1000,
+                fields: [
+                    "id",
+                    "short_name",
+                ]
+            })).data?.supports
 
-        return next_state
+            return await (await SupportsList.init!(ctx, {
+                supports: supports
+            })).process_state(ctx)
+        }
+
+        if (!button_payload) {
+            ctx.reply(lang.HOME.MESSAGE, {
+                attachments: [
+                    Keyboard.inlineKeyboard([
+                        [Keyboard.button.callback(lang.HOME.ALL_SUPPORTS_BUTTON, payloads.ALL_SUPPORTS)]
+                    ])
+                ]
+            })
+
+            ctx.metadata.sent = true
+        }
+
+        return state
     },
 }
 

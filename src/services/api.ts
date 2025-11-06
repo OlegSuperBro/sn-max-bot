@@ -1,3 +1,6 @@
+/**
+ * TODO Rewrite to get data from redis and then from navigator
+ */
 import Axios from "axios";
 import {
     Support,
@@ -39,10 +42,10 @@ axios.defaults.validateStatus = function (status) {
 
 function object2support(support: any): Support {
     return {
-        id: Number.parseInt(support.id),
-        created: new Date(support.created),
+        id: support.id && Number.parseInt(support.id),
+        created: support.created && new Date(support.created),
         created_by: support.created_by,
-        last_edit: new Date(support.last_edit),
+        last_edit: support.last_edit && new Date(support.last_edit),
         full_name: support.full_name,
         last_edited_by: support.last_edited_by,
         department: support.department,
@@ -125,7 +128,6 @@ export async function getSupports({
     section,
     ids = [],
     query = "",
-    onlyUser = false
 }: {
     limit?: number;
     offset?: number;
@@ -134,10 +136,10 @@ export async function getSupports({
     section?: number;
     ids?: Iterable<string | number>;
     query?: string;
-    onlyUser?: boolean;
 }
 ): Promise<ApiResponse<{ supports: Support[], count: number }>> {
     let response
+
     try {
         response = await axios.get(
             `/supports/`,
@@ -146,7 +148,6 @@ export async function getSupports({
                     limit: limit,
                     offset: offset,
                     fields: fields.length > 0 ? fields.join(",") : null,
-                    user: onlyUser,
                     portrait: portrait === "" ? null : portrait,
                     ids: ids && Array.from(ids).length > 0 ? (Array.from(ids)).join(",") : null,
                     section: section,
@@ -154,6 +155,7 @@ export async function getSupports({
                 }
             })
     } catch (error) {
+        console.log(error)
         if (Axios.isAxiosError(error)) {
             return { data: null, status: error.status! }
         }
@@ -169,14 +171,6 @@ export async function getSupports({
     })
 
     return { data: { supports, count: response.data.count }, status: response.status }
-}
-
-export async function getUserInfo(): Promise<ApiResponse<User>> {
-    const response = await axios.get(`/user/`)
-    return {
-        data: response.data as User,
-        status: response.status
-    }
 }
 
 
@@ -239,44 +233,6 @@ export async function getFilterLayout(): Promise<ApiResponse<FilterSection[]>> {
     return { data: layout, status: response.status }
 }
 
-export async function createSupport(support: Support, returnSupport: boolean = false): Promise<ApiResponse<Support | number>> {
-    const newSupportData = {
-        ...support,
-        documents: support.documents!.map((value) => value.id),
-        organizations: support.organizations!.map((value) => value.id),
-        municipalities: support.municipalities!.map((value) => value.id),
-        scope: support.scopes!.map((value) => value.id)
-    }
-    const response = await axios.post(`/supports/`, newSupportData)
-    const data: any = response.data
-    if (returnSupport) {
-        const { data: support, status } = await getSupport(data.id)
-        return { data: support, status: response.status }
-    }
-
-    return { data: data.id, status: response.status }
-}
-
-export async function updateSupport(support: Support, returnSupport: boolean = false): Promise<ApiResponse<Support | number>> {
-    const newSupportData = {
-        ...support,
-        documents: support.documents!.map((value) => value.id),
-        organizations: support.organizations!.map((value) => value.id),
-        municipalities: support.municipalities!.map((value) => value.id),
-        scope: support.scopes!.map((value) => value.id)
-    }
-
-    const response = await axios.post(`/supports/${newSupportData.id}/`, newSupportData)
-
-    if (returnSupport) {
-        const { data: support, status } = await getSupport(response.data.id)
-        return { data: support, status: response.status }
-    }
-
-    return { data: support.id!, status: response.status }
-}
-
-
 export async function getQualityPropertyTypes(): Promise<ApiResponse<QualityPropertyType[]>> {
     let response = await axios.get(`/quality_property_types/`)
 
@@ -307,28 +263,6 @@ export async function getTotalSupports(): Promise<ApiResponse<number>> {
 }
 
 
-export async function isCurrentUserOwner(supportId: number): Promise<ApiResponse<boolean>> {
-    let { data: supportData, status: supportStatus } = await getSupport(supportId)
-    let userData: User, userStatus: number
-    try {
-        const data = await getUserInfo()
-        userData = data.data as User
-        userStatus = data.status
-    } catch (err) {
-        if (Axios.isAxiosError(err)) {
-            return { data: null, status: err.status! }
-        }
-        throw err
-    }
-
-    if (supportStatus !== 200 || userStatus !== 200) {
-        return { data: null, status: supportStatus === 200 ? supportStatus : userStatus }
-    }
-
-    return { data: supportData!.department!.id === userData.department.id, status: 200 }
-}
-
-
 export async function getSettings(): Promise<ApiResponse<Settings>> {
     let response = await axios.get(`/settings/`)
 
@@ -353,12 +287,6 @@ export async function getMunicipalities(): Promise<ApiResponse<Municipality[]>> 
     let response = await axios.get(`/municipalities/`)
 
     return { data: response.data, status: response.status }
-}
-
-export async function deleteSupport(id: number): Promise<ApiResponse<null>> {
-    let response = await axios.delete(`/supports/${id}`)
-
-    return { data: null, status: response.status }
 }
 
 

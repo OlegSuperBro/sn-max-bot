@@ -18,8 +18,8 @@
   },
   "scripts": {
     "build": "tsc",
-    "start": "node dist/main.js",
-    "dev": "npx tsx watch src/main.ts"
+    "start": "node --env-file=.env dist/main.js",
+    "dev": "npx tsx watch --env-file=.env src/main.ts"
   },
   "author": "",
   "license": "ISC",
