@@ -10,7 +10,7 @@ import lang from "@/strings/ru.json"
 import format from "@/utils/format";
 import BetterContext from "@/BetterContext";
 import { getSupport } from "@/services/api";
-import { createScrollingKeyboard } from "@/utils/keyboard";
+import { createScrollingKeyboard, ScrollingKeyboardCallback } from "@/utils/keyboard";
 import { clamp } from "@/utils/things";
 import { sendOrEdit } from "@/utils/message";
 import { ErrorOccured } from "./ErrorOccured";
@@ -25,7 +25,7 @@ interface Metadata {
         supports: Support[]
         current_page: number,
         total_supports: number,
-        support: Support,
+        support?: Support,
         reply_url?: string,
     }
 }
@@ -48,9 +48,9 @@ export let ExpandedSupportsList: IState<InitParams> = {
 
         let page = clamp(ctx.metadata.expandedSupportsList.current_page, 0, ctx.metadata.expandedSupportsList.total_supports)
 
-        if (button_payload === payloads.BACK) {
+        if (button_payload === ScrollingKeyboardCallback.SCROLL_LEFT) {
             ctx.metadata.expandedSupportsList.current_page = page - 1
-        } else if (button_payload === payloads.FORWARD) {
+        } else if (button_payload === ScrollingKeyboardCallback.SCROLL_RIGHT) {
             ctx.metadata.expandedSupportsList.current_page = page + 1
         } else if (button_payload?.startsWith(payloads.SUPPORT)) {
             const id = Number.parseInt(button_payload.split("_")[1]!);
@@ -84,7 +84,7 @@ export let ExpandedSupportsList: IState<InitParams> = {
             ctx.callback!.payload = undefined
 
             NumberSelector.init!(ctx, {
-                nextState: SupportsList,
+                nextState: ExpandedSupportsList,
                 nextStateFunctionName: "fromSelector",
                 nextStateCancelFunctionName: "fromSelectorCancel",
                 min: 1,
@@ -103,7 +103,7 @@ export let ExpandedSupportsList: IState<InitParams> = {
             return await SupportsList.process_state(ctx)
         }
 
-        page = clamp(ctx.metadata.expandedSupportsList.current_page, 0, ctx.metadata.expandedSupportsList.total_supports)
+        page = clamp(ctx.metadata.expandedSupportsList.current_page, 0, ctx.metadata.expandedSupportsList.total_supports - 1)
 
         const support = (await getSupport(supports[page]!.id!)).data!
 
@@ -123,7 +123,9 @@ export let ExpandedSupportsList: IState<InitParams> = {
                     additionalButtons: [
                         [Keyboard.button.callback(lang.SUPPORTS.SWITCH_TO_COMPACT, payloads.SWITCH_TO_COMPACT)],
                         [Keyboard.button.callback(lang.GO_BACK, payloads.BACK_HOME)]
-                    ]
+                    ],
+                    valuesPerPage: 1,
+                    showValues: false,
                 }
 
             )
@@ -152,11 +154,12 @@ export let ExpandedSupportsList: IState<InitParams> = {
         return ExpandedSupportsList
     },
 
-    async init(ctx, args) {
-        ctx.metadata.expandedSupportsList = {}
-        ctx.metadata.expandedSupportsList.supports = args.supports
-        ctx.metadata.expandedSupportsList.total_supports = ctx.metadata.expandedSupportsList.supports.length
-        ctx.metadata.expandedSupportsList.current_page = args.startPage ?? 0
+    async init(ctx: BetterContext<Metadata>, args) {
+        ctx.metadata.expandedSupportsList = {
+            supports: args.supports,
+            total_supports: args.supports.length,
+            current_page: args.startPage ?? 0
+        }
         return ExpandedSupportsList
     },
 
@@ -165,18 +168,13 @@ export let ExpandedSupportsList: IState<InitParams> = {
     },
 
     async fromSelector(ctx: BetterContext<Metadata>, value: number) {
-        const supports = ctx.metadata.expandedSupportsList.supports
-        await this.clear!(ctx)
-        await this.init!(ctx, {
-            startPage: value - 1,
-            supports: supports
-        })
-
-        return await this.process_state(ctx)
+        ctx.metadata.expandedSupportsList.current_page = value - 1
+        ctx.metadata.expandedSupportsList.reply_url = undefined
+        return this.process_state(ctx)
     },
 
     async fromSelectorCancel(ctx: BetterContext<Metadata>) {
-        delete ctx.metadata.expandedSupportsList.reply_url
+        ctx.metadata.expandedSupportsList.reply_url = undefined
         return await this.process_state(ctx)
     },
 }
