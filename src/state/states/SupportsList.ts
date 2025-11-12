@@ -137,14 +137,10 @@ export let SupportsList: IState<InitParams> = {
     },
 
     async fromSelector(ctx: BetterContext, value: number) {
-        const supports = ctx.metadata.supportsList.supports
-        await this.clear!(ctx)
-        await this.init!(ctx, {
-            startPage: value - 1,
-            supports: supports
-        })
+        ctx.metadata.supportsList.current_page = value - 1
+        ctx.metadata.supportsList.reply_url = null
 
-        return await this.process_state(ctx)
+        return this.process_state(ctx)
     },
 
     async fromSelectorCancel(ctx: BetterContext) {

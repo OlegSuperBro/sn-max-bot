@@ -2,7 +2,7 @@ import BetterContext from "@/BetterContext";
 import State from "./IState";
 import { set_metadata, set_state } from "./state_managing";
 
-export default async function processState(ctx: BetterContext, state: State) {
+export default async function processState(ctx: BetterContext, state: State<any>) {
     if (state.active_on !== "all" && state.active_on?.indexOf(ctx.updateType) === -1) {
         return
     }

@@ -76,7 +76,6 @@ async function run() {
             console.log(`NO CURRENT STATE. RESETING`)
             ctx.currentState = await reset_state(ctx.user!.user_id.toString())
         }
-        // console.log(`GOT ${ctx.updateType}. TEXT: ${ctx.message?.body.text}. CURRENT STAGE: ${ctx.currentState.state_id} METADATA: ${JSON.stringify(ctx.metadata)}`)
         console.log(`GOT ${ctx.updateType}. TEXT: ${ctx.message?.body.text}. CURRENT STAGE: ${ctx.currentState.state_id} TIMESTAMP: ${ctx.message?.timestamp}`)
         try {
             await processState(ctx, ctx.currentState!)
