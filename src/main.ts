@@ -1,6 +1,7 @@
 import { Bot } from '@maxhub/max-bot-api'
 
 import BetterContext from '@/BetterContext';
+import filterRepeatsMiddleware from './middleware/filter_repeats';
 import stateMiddleware from './middleware/state';
 import metadataMiddleware from './middleware/metadata';
 import processState from './state/DefaultStateMachine';
@@ -43,6 +44,7 @@ async function run_backup() {
 }
 
 async function run() {
+    bot.use(filterRepeatsMiddleware)
     bot.use(stateMiddleware)
     bot.use(metadataMiddleware)
 
