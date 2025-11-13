@@ -5,7 +5,17 @@
 
     "HOME": {
         "MESSAGE": "Выберите действие",
-        "ALL_SUPPORTS_BUTTON": "Показать все поддержки"
+        "SETUP_FILTERS": "Настроить фильтры",
+        "ALL_SUPPORTS_BUTTON": "Показать все поддержки",
+        "FILTERED_SUPPORTS_BUTTON": "Показать доступные мне поддержки"
+    },
+
+    "FILTER": {
+        "SELECT_SECTION": "select_section",
+        "SECTION_DONE": "✅ {name}",
+        "SECTION_NOT_DONE": "{name}",
+        "CONFIRM_VALUE_SELECTION": "Вы выбрали:\n{value}\nВерно?",
+        "DELETE_VALUE": "Удалить текущее значение"
     },
 
     "SUPPORTS": {
@@ -40,5 +50,10 @@
     },
 
     "GO_BACK": "Назад",
-    "CANCEL": "Отмена"
+    "CANCEL": "Отмена",
+
+    "CONFIRM": {
+        "YES": "Да",
+        "NO": "Нет"
+    }
 }

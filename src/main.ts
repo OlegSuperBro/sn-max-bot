@@ -4,6 +4,7 @@ import BetterContext from '@/BetterContext';
 import filterRepeatsMiddleware from './middleware/filter_repeats';
 import stateMiddleware from './middleware/state';
 import metadataMiddleware from './middleware/metadata';
+import userDataMiddleware from './middleware/user_data';
 import processState from './state/DefaultStateMachine';
 
 import lang from '@/strings/ru.json'
@@ -14,7 +15,7 @@ import { reset_state } from './state/state_managing';
 const bot = new Bot(process.env["BOT_TOKEN"]!, {
     contextType: BetterContext<{}>,
     clientOptions: {
-        // @ts-expect-error
+        // @ts-expect-error why do they have this set as literal...
         baseUrl: "https://platform-api.max.ru"
     }
 });
@@ -38,7 +39,7 @@ async function run_backup() {
         ctx.reply(lang.STUB_MESSAGE)
     })
     let bot_promise = bot.start();
-    console.log("BOT READY IN BACKUP MODE")
+    console.info("BOT READY IN BACKUP MODE")
 
     await bot_promise;
 }
@@ -47,6 +48,7 @@ async function run() {
     bot.use(filterRepeatsMiddleware)
     bot.use(stateMiddleware)
     bot.use(metadataMiddleware)
+    bot.use(userDataMiddleware)
 
     bot.on([
         "message_callback",
@@ -62,29 +64,30 @@ async function run() {
         "message_construction_request",
         "message_constructed",
         "message_chat_created"
-    ], async (ctx) => {
+    ], async (ctx, next) => {
         if (ctx.updateType == "bot_started") {
-            console.log(`BOT STARTED. SETTING NULL STATE`)
+            console.debug(`BOT STARTED. SETTING NULL STATE`)
             ctx.currentState = null
         }
 
         if (ctx.message?.body.text == "reset") {
-            console.log(`GOT RESET COMMAND. RESETING STATE`)
+            console.debug(`GOT RESET COMMAND. RESETING STATE`)
             ctx.currentState = null
             await ctx.reply("RESET")
         }
 
         if (!ctx.currentState) {
-            console.log(`NO CURRENT STATE. RESETING`)
+            console.debug(`NO CURRENT STATE. RESETING`)
             ctx.currentState = await reset_state(ctx.user!.user_id.toString())
         }
-        console.log(`GOT ${ctx.updateType}. TEXT: ${ctx.message?.body.text}. CURRENT STAGE: ${ctx.currentState.state_id} TIMESTAMP: ${ctx.message?.timestamp}`)
+        console.debug(`GOT ${ctx.updateType}. TEXT: ${ctx.message?.body.text}. CURRENT STAGE: ${ctx.currentState.state_id} TIMESTAMP: ${ctx.message?.timestamp}`)
         try {
             await processState(ctx, ctx.currentState!)
         } catch (e) {
             await ctx.reply(lang.ERROR.INTERNAL_ERROR)
-            console.log(e)
+            console.error(e)
         }
+        await next()
     })
 
     loop(bot)
@@ -92,8 +95,7 @@ async function run() {
 
 async function loop(bot: Bot<BetterContext>) {
     bot.start().catch((r) => {
-        console.log("BOT CRASHED")
-        console.log(typeof r)
+        console.warn("BOT CRASHED")
         console.error(r)
         bot.stop()
 
@@ -101,7 +103,7 @@ async function loop(bot: Bot<BetterContext>) {
             loop(bot)
         }, 500)
     })
-    console.log("BOT STARTED");
+    console.info("BOT STARTED");
 }
 
 if (process.env.BOT_STATE === "backup") {

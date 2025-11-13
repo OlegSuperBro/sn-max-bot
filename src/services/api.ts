@@ -155,7 +155,6 @@ export async function getSupports({
                 }
             })
     } catch (error) {
-        console.log(error)
         if (Axios.isAxiosError(error)) {
             return { data: null, status: error.status! }
         }

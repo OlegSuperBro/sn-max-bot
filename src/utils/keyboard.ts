@@ -1,6 +1,8 @@
 import { Keyboard } from "@maxhub/max-bot-api";
 import { Button, CallbackButton } from "@maxhub/max-bot-api/types";
 
+const isDebug = process.env["NODE_ENV"] == "development"
+
 export enum ScrollingKeyboardCallback {
     SCROLL_LEFT = "scroll_left",
     SCROLL_RIGHT = "scroll_right",
@@ -74,7 +76,12 @@ export function createScrollingKeyboard(values: {id: string, value: string}[], p
 
     return Keyboard.inlineKeyboard([
         ...filtered_values.map((val) => {
-            return [Keyboard.button.callback(val.value, val.id)]
+            if (val.value.length >= 128) {
+                if (isDebug) {
+                    console.warn(`Value with id=${val.id} is too long (${val.value.length}). Slicing it...`)
+                }
+            }
+            return [Keyboard.button.callback(val.value.slice(0, 128), val.id)]
         }),
         [
             Keyboard.button.callback(page <= 0 ? scrollLeftNotAllowedText : scrollLeftText, scrollLeftCallback),

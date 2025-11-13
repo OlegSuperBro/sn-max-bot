@@ -10,12 +10,12 @@ export default async function stateMiddleware(ctx: BetterContext, next: () => Pr
     const currentTime = Date.now()
     if (ctx.updateType === "message_callback") {
         if (ctx.callback!.timestamp + MS_LIMIT < currentTime) {
-            console.log(`GOT LATE MESSAGE. MESSAGE TIMESTAMP: ${ctx.message!.timestamp} CURRENT TIME: ${currentTime} DIFFERENCE IS > ${MS_LIMIT}`)
+            console.debug(`GOT LATE MESSAGE. MESSAGE TIMESTAMP: ${ctx.message!.timestamp} CURRENT TIME: ${currentTime} DIFFERENCE IS > ${MS_LIMIT}`)
             return
         }
     } else if (ctx.updateType === "message_created") {
         if (ctx.message!.timestamp + MS_LIMIT < currentTime) {
-            console.log(`GOT LATE MESSAGE. MESSAGE TIMESTAMP: ${ctx.message!.timestamp} CURRENT TIME: ${currentTime} DIFFERENCE IS > ${MS_LIMIT}`)
+            console.debug(`GOT LATE MESSAGE. MESSAGE TIMESTAMP: ${ctx.message!.timestamp} CURRENT TIME: ${currentTime} DIFFERENCE IS > ${MS_LIMIT}`)
             return
         }
     }

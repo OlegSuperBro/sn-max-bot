@@ -18,7 +18,7 @@ async function get_create_connection(url: string = 'redis://localhost:6379') {
     });
 
     await client.connect();
-    console.log('Connected to Redis');
+    console.info('Connected to Redis');
 
     return client
 }

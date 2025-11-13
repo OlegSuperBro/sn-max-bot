@@ -2,10 +2,13 @@ import BetterContext from "@/BetterContext";
 import State from "./IState";
 import { set_metadata, set_state } from "./state_managing";
 
+import get_redis from "@/redis"
+
 export default async function processState(ctx: BetterContext, state: State<any>) {
     if (state.active_on !== "all" && state.active_on?.indexOf(ctx.updateType) === -1) {
         return
     }
+    const redis = await get_redis()
 
     let new_state = await state.process_state(ctx);
 
@@ -14,4 +17,6 @@ export default async function processState(ctx: BetterContext, state: State<any>
     }
 
     await set_metadata(ctx.user!.user_id.toString(), ctx.metadata)
+
+    await redis.set(`user_portrait:${ctx.user!.user_id}`, ctx.userData.portrait.toString())
 }

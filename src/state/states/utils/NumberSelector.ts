@@ -1,6 +1,6 @@
 import format from "@/utils/format";
-import IState from "../IState";
-import { get_state_from_id } from "../state_managing";
+import IState from "../../IState";
+import { get_state_from_id } from "../../state_managing";
 import lang from "@/strings/ru.json"
 import { Keyboard } from "@maxhub/max-bot-api";
 import BetterContext from "@/BetterContext";

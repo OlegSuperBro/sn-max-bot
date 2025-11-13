@@ -6,7 +6,7 @@ import { Support } from "@/typings/api";
 import SupportInfo from "./SupportInfo"
 import Home from "./Home"
 import format from "@/utils/format";
-import { NumberSelector } from "./NumberSelector"
+import { NumberSelector } from "./utils/NumberSelector"
 import BetterContext from "@/BetterContext";
 import { ExpandedSupportsList } from "./ExpandedSupportsList";
 import { clamp } from "@/utils/things";
