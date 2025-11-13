@@ -6,7 +6,7 @@ import {
 } from '@/utils/keyboard'
 import { clamp } from '@/utils/things'
 import { ErrorOccured } from '../ErrorOccured'
-import Home from '../Home'
+import { Home } from '../Home'
 import { NumberSelector } from '../utils/NumberSelector'
 import { sendOrEdit } from '@/utils/message'
 import { selectFilterSectionProperty } from './SelectProperty'

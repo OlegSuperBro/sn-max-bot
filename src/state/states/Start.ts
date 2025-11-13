@@ -1,6 +1,6 @@
 import IState from "../IState";
 import { reset_metadata, reset_state } from "../state_managing";
-import HomeState from "./Home"
+import { Home } from "./Home"
 import lang from "@/strings/ru.json"
 
 let state: IState<{}> = {
@@ -19,7 +19,7 @@ let state: IState<{}> = {
             }, 200)
         })
 
-        return await HomeState.process_state(ctx)
+        return await Home.process_state(ctx)
     },
 }
 

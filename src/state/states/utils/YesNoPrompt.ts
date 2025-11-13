@@ -55,7 +55,7 @@ export let YesNoPrompt: IState<InitParams> = {
         ctx.reply(selector_text, {
             attachments: [
                 Keyboard.inlineKeyboard([
-                    [Keyboard.button.chat(yes_text, payloads.YES), Keyboard.button.callback(no_text, payloads.NO)]
+                    [Keyboard.button.callback(yes_text, payloads.YES), Keyboard.button.callback(no_text, payloads.NO)]
                 ])
             ]
         })

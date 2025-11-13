@@ -4,7 +4,7 @@ import lang from "@/strings/ru.json"
 import { Support } from "@/typings/api";
 
 import SupportInfo from "./SupportInfo"
-import Home from "./Home"
+import { Home } from "./Home"
 import format from "@/utils/format";
 import { NumberSelector } from "./utils/NumberSelector"
 import BetterContext from "@/BetterContext";

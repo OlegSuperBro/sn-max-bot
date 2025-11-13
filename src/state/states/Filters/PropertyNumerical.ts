@@ -6,7 +6,7 @@ import {
 } from '@/utils/keyboard'
 import { clamp } from '@/utils/things'
 import { ErrorOccured } from '../ErrorOccured'
-import Home from '../Home'
+import { Home } from '../Home'
 import { sendOrEdit } from '@/utils/message'
 import { Keyboard } from '@maxhub/max-bot-api'
 import lang from '@/strings/ru.json'

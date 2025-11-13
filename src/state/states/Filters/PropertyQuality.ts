@@ -6,7 +6,7 @@ import {
 } from '@/utils/keyboard'
 import { clamp } from '@/utils/things'
 import { ErrorOccured } from '../ErrorOccured'
-import Home from '../Home'
+import { Home } from '../Home'
 import { sendOrEdit } from '@/utils/message'
 import { Keyboard } from '@maxhub/max-bot-api'
 import lang from '@/strings/ru.json'
@@ -89,7 +89,7 @@ export let PropertyQuality: IState<InitParams> = {
             return await selectFilterSectionProperty.process_state(ctx)
         } else if (button_payload === payloads.DELETE) {
             ctx.callback!.payload = undefined
-            await ctx.reply("TODO DELETION")
+            ctx.userData.portrait.removeAllQualityProperties(qualityPropertyType)
             return await selectFilterSectionProperty.process_state(ctx)
         }
 

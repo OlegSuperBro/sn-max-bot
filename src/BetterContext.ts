@@ -166,6 +166,11 @@ export class Portrait {
         }
     }
 
+    public removeAllQualityProperties(property: QualityPropertyType) {
+        const key = `qt${property.id}`
+        this.properties.delete(key)
+    }
+
     public includes(property: FilterProperty) {
         return !!this.properties.keys().find((val) => val == `${property.type == "q" ? "qt" : "n"}${property.property.id}`)
     }

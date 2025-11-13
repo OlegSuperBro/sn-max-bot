@@ -1,7 +1,7 @@
 import { Support } from "@/typings/api";
 import IState from "../IState";
 import SupportInfo from "./SupportInfo";
-import Home from "./Home";
+import { Home } from "./Home";
 import { NumberSelector } from "./utils/NumberSelector";
 import { SUPPORTS_PER_PAGE, SupportsList } from "./SupportsList";
 import { Keyboard } from "@maxhub/max-bot-api";

@@ -7,7 +7,12 @@
         "MESSAGE": "Выберите действие",
         "SETUP_FILTERS": "Настроить фильтры",
         "ALL_SUPPORTS_BUTTON": "Показать все поддержки",
-        "FILTERED_SUPPORTS_BUTTON": "Показать доступные мне поддержки"
+        "FILTERED_SUPPORTS_BUTTON": "Показать доступные мне поддержки",
+        "NO_FILTERS_SET": {
+            "TEXT": "У вас не выбраны фильтры. Вам будут показаны все меры поддержки.",
+            "CONTINUE": "Продолжить",
+            "SET_FILTERS": "Настроить фильтры"
+        }
     },
 
     "FILTER": {
@@ -15,7 +20,7 @@
         "SECTION_DONE": "✅ {name}",
         "SECTION_NOT_DONE": "{name}",
         "CONFIRM_VALUE_SELECTION": "Вы выбрали:\n{value}\nВерно?",
-        "DELETE_VALUE": "Удалить текущее значение"
+        "DELETE_VALUE": "Удалить все выбранные значения"
     },
 
     "SUPPORTS": {

@@ -6,7 +6,7 @@ import { clamp } from "@/utils/things";
 import { createScrollingKeyboard, ScrollingKeyboardCallback } from "@/utils/keyboard";
 import { NumberSelector } from "../utils/NumberSelector";
 import { ErrorOccured } from "../ErrorOccured";
-import Home from "../Home";
+import { Home } from "../Home";
 import { sendOrEdit } from "@/utils/message";
 import { Keyboard } from "@maxhub/max-bot-api";
 import { SelectFilterSection } from "./SelectFilterSection";
