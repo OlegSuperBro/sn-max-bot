@@ -137,7 +137,7 @@ export let ExpandedSupportsList: IState<InitParams> = {
                 message_id: ctx.currentState?.state_id == ExpandedSupportsList.state_id ? ctx.message?.body.mid : undefined,
                 text: format(lang.SUPPORTS.EXPANDED_TEXT, {
                     name: support.full_name,
-                    description: support.description,
+                    description: support.description!.slice(0, 3000) + (support.description!.length > 3400 ? "..." : ""),
                     result: support.result,
                     provider: support.provider,
                     organizations: "- " + support.organizations!.map((val) => `[${val.name}](${val.link})`).join("\n- ")

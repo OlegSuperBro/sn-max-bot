@@ -46,7 +46,7 @@ let state: IState<InitParams> = {
 
         const result_text = format(lang.SUPPORTS.SUPPORT_INFO, {
             "name": support.full_name,
-            "description": support.description,
+            "description": support.description!.slice(0, 3000) + (support.description!.length > 3400 ? "..." : ""),
             "result": support.result,
             "provider": support.provider,
             "organizations": "- " + support.organizations!.map((val) => `[${val.name}](${val.link})`).join("\n- ")
