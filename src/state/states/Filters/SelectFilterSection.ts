@@ -12,6 +12,7 @@ import { sendOrEdit } from '@/utils/message'
 import { selectFilterSectionProperty } from './SelectProperty'
 import { Keyboard } from '@maxhub/max-bot-api'
 import lang from '@/strings/ru.json'
+import format from '@/utils/format'
 
 interface Metadata {
     selectFilterSection: {
@@ -90,16 +91,28 @@ export let SelectFilterSection: IState<InitParams> = {
         )
 
         function create_keyboard() {
+
             return createScrollingKeyboard(
                 layout.map((val) => {
+                    const is_done = val.properties.every((property) => {
+                        return ctx.userData.portrait.includes(property)
+                    })
                     return {
                         id: `${payloads.SECTION}${val.id.toString()}`,
-                        value: val.name,
+                        value: is_done ?
+                            format(lang.FILTER.SECTION_DONE, {name: val.name}) :
+                            format(lang.FILTER.SECTION_NOT_DONE, {name: val.name}),
                     }
                 }),
                 page,
                 {
                     additionalButtons: [
+                        [
+                            Keyboard.button.callback(
+                                lang.FILTER.RESET_ALL_BUTTON,
+                                payloads.RESET_ALL
+                            )
+                        ],
                         [
                             Keyboard.button.callback(
                                 lang.GO_BACK,
