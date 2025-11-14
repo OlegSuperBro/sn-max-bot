@@ -55,7 +55,7 @@ export let selectFilterSectionProperty: IState<InitParams> = {
                 return val.property.id == id && val.type === type
             })
 
-            if (!section) {
+            if (!property) {
                 ErrorOccured.init!(ctx, {
                     nextState: Home
                 })
@@ -130,6 +130,20 @@ export let selectFilterSectionProperty: IState<InitParams> = {
     },
 
     async init(ctx: BetterContext<Metadata>, args) {
+        if (args.section.properties.length == 1) {
+            const property = args.section.properties[0]!
+            if (property.type == "q") {
+                return await PropertyQuality.init!(ctx, {
+                    propertyType: args.section.properties[0]!.property as QualityPropertyType,
+                    nextState: SelectFilterSection
+                })
+            } else if (property.type == "n") {
+                return await PropertyNumerical.init!(ctx, {
+                    property: property.property as NumericalProperty,
+                    nextState: SelectFilterSection,
+                })
+            }
+        }
         ctx.metadata.selectFilterSectionProperty = {
             currentPage: 0,
             section: args.section

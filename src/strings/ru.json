@@ -6,8 +6,8 @@
     "HOME": {
         "MESSAGE": "Выберите действие",
         "SETUP_FILTERS": "Настроить фильтры",
-        "ALL_SUPPORTS_BUTTON": "Показать все поддержки",
-        "FILTERED_SUPPORTS_BUTTON": "Показать доступные мне поддержки",
+        "ALL_SUPPORTS_BUTTON": "Показать все меры поддержки",
+        "FILTERED_SUPPORTS_BUTTON": "Показать доступные мне меры поддержки",
         "NO_FILTERS_SET": {
             "TEXT": "У вас не выбраны фильтры. Вам будут показаны все меры поддержки.",
             "CONTINUE": "Продолжить",
@@ -16,15 +16,26 @@
     },
 
     "FILTER": {
-        "SELECT_SECTION": "select_section",
+        "RESET_ALL": "**!!!ВНИМАНИЕ!!!**\nПосле удаления всех сохранённых ответов, отменить данное действие будет невозможно.\nПродолжить?",
+        "RESET_ALL_BUTTON": "Очистить фильтры",
+
+        "SELECT_SECTION": "Выберите категорию вопроса",
+        "SELECT_PROPERTY": "Выберите вопрос\n**Категория**: \"{section_name}\"",
+        "SELECT_QUALITY_VALUE": "Выберите значение для ответа\n**Категория**: \"{section_name}\"\n**Вопрос**: \"{property_name}\"",
+        "SELECT_SINGLE_QUALITY_VALUE": "Выберите значение для ответа\n**Вопрос**: \"{property_name}\"",
+        "ENTER_NUMERICAL_VALUE": "Введите ответ в виде числа\n**Категория**: \"{section_name}\"\n**Вопрос**: \"{property_name}\"",
+        "ENTER_SINGLE_NUMERICAL_VALUE": "Введите ответ в виде числа\n**Вопрос**: \"{property_name}\"",
+        "OLD_VALUE": "\nПрошлый ответ: {old_value}",
+
         "SECTION_DONE": "✅ {name}",
         "SECTION_NOT_DONE": "{name}",
         "CONFIRM_VALUE_SELECTION": "Вы выбрали:\n{value}\nВерно?",
-        "DELETE_VALUE": "Удалить все выбранные значения"
+        "DELETE_ALL_VALUES": "Удалить все выбранные значения",
+        "DELETE_VALUE": "Удалить сохранённое значение"
     },
 
     "SUPPORTS": {
-        "SELECT_SUPPORT_FROM_LIST": "Выберите поддержку. Доступно {total_supports} поддержек",
+        "SELECT_SUPPORT_FROM_LIST": "Выберите меру поддержки. Доступно {total_supports} мер поддержки",
 
         "SUPPORT_INFO": "**{name}**\n{description}\n***Результат***:\n{result}\n\n***Отдел, осуществляющий предоставление меры поддержки:***\n{provider}\n\n***Предоставляющие организации:***\n{organizations}",
 

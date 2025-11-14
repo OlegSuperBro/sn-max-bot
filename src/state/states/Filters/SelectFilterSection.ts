@@ -13,6 +13,7 @@ import { selectFilterSectionProperty } from './SelectProperty'
 import { Keyboard } from '@maxhub/max-bot-api'
 import lang from '@/strings/ru.json'
 import format from '@/utils/format'
+import { YesNoPrompt } from '../utils/YesNoPrompt'
 
 interface Metadata {
     selectFilterSection: {
@@ -26,6 +27,7 @@ enum payloads {
     SECTION = 'section_',
     BACK_HOME = 'back_home',
     SELECT_PAGE = 'select_page',
+    RESET_ALL = 'reset_all'
 }
 
 const SECTIONS_PER_PAGE = 5
@@ -62,11 +64,11 @@ export let SelectFilterSection: IState<InitParams> = {
                 return ErrorOccured.process_state(ctx)
             }
 
-            await selectFilterSectionProperty.init!(ctx, {
+            const state = await selectFilterSectionProperty.init!(ctx, {
                 section: section,
             })
 
-            return await selectFilterSectionProperty.process_state(ctx)
+            return await state.process_state(ctx)
         } else if (button_payload === payloads.BACK_HOME) {
             ctx.callback!.payload = undefined
             return await Home.process_state(ctx)
@@ -82,6 +84,17 @@ export let SelectFilterSection: IState<InitParams> = {
             })
 
             return await NumberSelector.process_state(ctx)
+        } else if (button_payload === payloads.RESET_ALL) {
+            ctx.callback!.payload = undefined
+
+            const new_state = await YesNoPrompt.init!(ctx, {
+                nextState: SelectFilterSection,
+                yesCallbackName: "confirmResetAll",
+                noCallbackName: "abortResetAll",
+                prompt: lang.FILTER.RESET_ALL,
+            })
+
+            return await new_state.process_state(ctx)
         }
 
         page = clamp(
@@ -158,5 +171,14 @@ export let SelectFilterSection: IState<InitParams> = {
     async fromSelectorCancel(ctx: BetterContext) {
         ctx.metadata.selectFilterSection.replyUrl = null
         return await this.process_state(ctx)
+    },
+
+    async confirmResetAll(ctx: BetterContext) {
+        ctx.userData.portrait.clear()
+        return await SelectFilterSection.process_state(ctx)
+    },
+
+    async abortResetAll(ctx: BetterContext) {
+        return await SelectFilterSection.process_state(ctx)
     },
 }

@@ -1,35 +1,35 @@
 import BetterContext from '@/BetterContext'
 import IState from '../../IState'
-import {
-    createScrollingKeyboard,
-    ScrollingKeyboardCallback,
-} from '@/utils/keyboard'
-import { clamp } from '@/utils/things'
-import { ErrorOccured } from '../ErrorOccured'
-import { Home } from '../Home'
-import { sendOrEdit } from '@/utils/message'
-import { Keyboard } from '@maxhub/max-bot-api'
+
 import lang from '@/strings/ru.json'
 import { NumericalProperty } from '@/typings/api'
 import { selectFilterSectionProperty } from './SelectProperty'
-import { YesNoPrompt } from '../utils/YesNoPrompt'
 import format from '@/utils/format'
 import { NumberSelector } from '../utils/NumberSelector'
+import { FilterSection } from '@/typings/filter'
+import { get_state_from_id } from '@/state/state_managing'
 
 interface Metadata {
     propertyNumerical: {
+        nextStateId: string,
+        nextStateInitParams?: any,
+
         property: NumericalProperty,
         section?: FilterSection,
     }
 }
 
 interface InitParams {
+    nextState?: IState<any>,
+    nextStateInitParams?: any,
+
     property: NumericalProperty,
     section?: FilterSection,
 }
 
 enum payloads {
     BACK = 'back',
+    DELETE_VALUE = 'delete_value',
 }
 
 export let PropertyNumerical: IState<InitParams> = {
@@ -43,6 +43,23 @@ export let PropertyNumerical: IState<InitParams> = {
             type: 'n',
             property: property,
         })
+
+        const next_state = get_state_from_id(ctx.metadata.propertyNumerical.nextStateId)!
+        const next_state_init_params = ctx.metadata.propertyNumerical.nextStateInitParams
+
+        const button_payload = ctx.callback?.payload
+
+        if (button_payload === payloads.DELETE_VALUE) {
+            ctx.userData.portrait.removeAllNumericalPropertyValues(property)
+
+            let new_state = next_state
+
+            if (next_state_init_params) {
+                new_state = await next_state.init!(ctx, next_state_init_params)
+            }
+
+            return await new_state.process_state(ctx)
+        }
 
         await NumberSelector.init!(ctx, {
             nextState: PropertyNumerical,
@@ -74,6 +91,8 @@ export let PropertyNumerical: IState<InitParams> = {
 
     async init(ctx: BetterContext<Metadata>, args) {
         ctx.metadata.propertyNumerical = {
+            nextStateId: args.nextState?.state_id ?? selectFilterSectionProperty.state_id,
+            nextStateInitParams: args.nextStateInitParams,
             property: args.property,
             section: args.section,
         }
@@ -82,11 +101,36 @@ export let PropertyNumerical: IState<InitParams> = {
     },
 
     async fromSelector(ctx: BetterContext<Metadata>, value: number) {
-        await ctx.reply(`GOT VALUE: ${value}`)
-        return await selectFilterSectionProperty.process_state(ctx)
+        const next_state = get_state_from_id(ctx.metadata.propertyNumerical.nextStateId)!
+        const next_state_init_params = ctx.metadata.propertyNumerical.nextStateInitParams
+
+        const property = ctx.metadata.propertyNumerical.property
+        ctx.userData.portrait.addProperty(
+            {
+                type: 'n',
+                property: property,
+            },
+            value
+        )
+        let new_state = next_state
+
+        if (next_state_init_params) {
+            new_state = await next_state.init!(ctx, next_state_init_params)
+        }
+
+        return await new_state.process_state(ctx)
     },
 
     async fromSelectorCancel(ctx: BetterContext<Metadata>) {
-        return await selectFilterSectionProperty.process_state(ctx)
+        const next_state = get_state_from_id(ctx.metadata.propertyNumerical.nextStateId)!
+        const next_state_init_params = ctx.metadata.propertyNumerical.nextStateInitParams
+
+        let new_state = next_state
+
+        if (next_state_init_params) {
+            new_state = await next_state.init!(ctx, next_state_init_params)
+        }
+
+        return await new_state.process_state(ctx)
     },
 }
