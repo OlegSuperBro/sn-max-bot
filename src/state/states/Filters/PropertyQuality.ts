@@ -89,7 +89,8 @@ export let PropertyQuality: IState<InitParams> = {
                 return ErrorOccured.process_state(ctx)
             }
 
-            if (qProperty.name.length >= 45) {
+            // 45
+            if (qProperty.name.length >= 0) {
                 ctx.metadata.propertyQuality.selectedProperty = qProperty
 
                 await YesNoPrompt.init!(ctx, {
