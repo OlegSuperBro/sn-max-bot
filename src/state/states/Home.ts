@@ -72,6 +72,12 @@ export let Home: IState<{}> = {
                 Keyboard.inlineKeyboard([
                     [
                         Keyboard.button.callback(
+                            lang.HOME.SETUP_FILTERS,
+                            payloads.SETUP_FILTERS
+                        ),
+                    ],
+                    [
+                        Keyboard.button.callback(
                             lang.HOME.ALL_SUPPORTS_BUTTON,
                             payloads.ALL_SUPPORTS
                         ),
@@ -80,12 +86,6 @@ export let Home: IState<{}> = {
                         Keyboard.button.callback(
                             lang.HOME.FILTERED_SUPPORTS_BUTTON,
                             payloads.FILTERED_SUPPORTS
-                        ),
-                    ],
-                    [
-                        Keyboard.button.callback(
-                            lang.HOME.SETUP_FILTERS,
-                            payloads.SETUP_FILTERS
                         ),
                     ],
                 ]),
