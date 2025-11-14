@@ -9,7 +9,7 @@ import format from "@/utils/format";
 import { NumberSelector } from "./utils/NumberSelector"
 import BetterContext from "@/BetterContext";
 import { ExpandedSupportsList } from "./ExpandedSupportsList";
-import { clamp } from "@/utils/things";
+import { clamp, Ending, getWordEnding } from "@/utils/things";
 import { createScrollingKeyboard, ScrollingKeyboardCallback } from "@/utils/keyboard";
 import { sendOrEdit as sendOrEditMessage } from "@/utils/message";
 import { ErrorOccured } from "./ErrorOccured";
@@ -125,12 +125,17 @@ export let SupportsList: IState<InitParams> = {
             )
         }
 
+        const total_supports = ctx.metadata.supportsList.total_supports
+        const ending = getWordEnding(total_supports)
+
+        let message = ending === Ending.NONE ? lang.SUPPORTS.SELECT_SUPPORT_FROM_LIST_NONE : ending === Ending.SINGLE ? lang.SUPPORTS.SELECT_SUPPORT_FROM_LIST_SINGLE : lang.SUPPORTS.SELECT_SUPPORT_FROM_LIST_PLURAL
+
         await sendOrEditMessage(
             ctx,
             {
                 message_id: ctx.currentState?.state_id == SupportsList.state_id ? ctx.message?.body.mid : undefined,
-                text: format(lang.SUPPORTS.SELECT_SUPPORT_FROM_LIST, {
-                    total_supports: ctx.metadata.supportsList.total_supports,
+                text: format(message, {
+                    total_supports: total_supports,
                 }),
                 extra: {
                     attachments: [

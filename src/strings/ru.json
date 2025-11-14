@@ -35,7 +35,9 @@
     },
 
     "SUPPORTS": {
-        "SELECT_SUPPORT_FROM_LIST": "Выберите меру поддержки. Доступно {total_supports} мер поддержки",
+        "SELECT_SUPPORT_FROM_LIST_NONE": "Выберите меру поддержки. Доступно {total_supports} мер поддержки",
+        "SELECT_SUPPORT_FROM_LIST_SINGLE": "Выберите меру поддержки. Доступна {total_supports} мера поддержки",
+        "SELECT_SUPPORT_FROM_LIST_PLURAL": "Выберите меру поддержки. Доступно {total_supports} меры поддержки",
 
         "SUPPORT_INFO": "**{name}**\n{description}\n***Результат***:\n{result}\n\n***Отдел, осуществляющий предоставление меры поддержки:***\n{provider}\n\n***Предоставляющие организации:***\n{organizations}",
 
