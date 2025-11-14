@@ -139,7 +139,7 @@ export class Portrait {
         }
     }
 
-    public removeProperty(property: FilterProperty, value: QualityProperty | number) {
+    public removePropertyValue(property: FilterProperty, value: QualityProperty | number) {
         if (property.type == "q") {
             const key = `qt${property.property.id}`
             let old_value = this.properties.get(key)
@@ -171,6 +171,11 @@ export class Portrait {
         this.properties.delete(key)
     }
 
+    public removeAllNumericalPropertyValues(property: NumericalProperty) {
+        const key = `n${property.id}`
+        this.properties.delete(key)
+    }
+
     public includes(property: FilterProperty) {
         return !!this.properties.keys().find((val) => val == `${property.type == "q" ? "qt" : "n"}${property.property.id}`)
     }
@@ -193,6 +198,14 @@ export class Portrait {
 
     public get lenght() : number {
         return this.properties.keys().reduce((prev) => {return prev+1}, 0)
+    }
+
+    public getValue(property: FilterProperty) {
+        return this.properties.get(`${property.type == "q" ? "qt" : "n"}${property.property.id}`)
+    }
+
+    public clear() {
+        this.properties.clear()
     }
 }
 
