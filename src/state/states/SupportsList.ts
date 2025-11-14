@@ -14,7 +14,7 @@ import { createScrollingKeyboard, ScrollingKeyboardCallback } from "@/utils/keyb
 import { sendOrEdit as sendOrEditMessage } from "@/utils/message";
 import { ErrorOccured } from "./ErrorOccured";
 
-export const SUPPORTS_PER_PAGE = 10
+export const SUPPORTS_PER_PAGE = 7
 
 enum payloads {
     SUPPORT = "support_",
