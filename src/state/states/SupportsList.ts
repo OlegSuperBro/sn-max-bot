@@ -12,6 +12,7 @@ import { ExpandedSupportsList } from "./ExpandedSupportsList";
 import { clamp } from "@/utils/things";
 import { createScrollingKeyboard, ScrollingKeyboardCallback } from "@/utils/keyboard";
 import { sendOrEdit as sendOrEditMessage } from "@/utils/message";
+import { ErrorOccured } from "./ErrorOccured";
 
 export const SUPPORTS_PER_PAGE = 10
 
@@ -19,6 +20,14 @@ enum payloads {
     SUPPORT = "support_",
     BACK_HOME = "back_home",
     SWITCH_TO_EXPANDED = "switch_to_expanded",
+}
+
+interface Metadata {
+    supportsList: {
+        supports: Support[],
+        total_supports: number,
+        current_page: number,
+    }
 }
 
 interface InitParams {
@@ -29,7 +38,7 @@ interface InitParams {
 export let SupportsList: IState<InitParams> = {
     state_id: "show_supports",
     active_on: "all",
-    async process_state(ctx) {
+    async process_state(ctx: BetterContext<Metadata>) {
         const supports = ctx.metadata.supportsList.supports as Support[]
 
         const button_payload = ctx.callback?.payload
@@ -45,18 +54,28 @@ export let SupportsList: IState<InitParams> = {
         } else if (button_payload?.startsWith(payloads.SUPPORT)) {
             const id = Number.parseInt(button_payload.split("_")[1]!);
 
-            ctx.metadata.support = supports.find((val) => {
+            const support = supports.find((val) => {
                 return val.id == id
             })
 
-            SupportInfo.process_state(ctx)
+            if (!support) {
+                ErrorOccured.init!(ctx, {
+                    nextState: Home
+                })
 
-            return SupportInfo
+                return ErrorOccured.process_state(ctx)
+            }
+
+            await SupportInfo.init!(ctx, {
+                nextState: SupportsList,
+                support: support,
+            })
+
+            return await SupportInfo.process_state(ctx)
         } else if (button_payload === payloads.BACK_HOME) {
-            ctx.metadata = {}
             ctx.callback!.payload = undefined
-            await Home.process_state(ctx)
-            return Home
+            return await Home.process_state(ctx)
+
         } else if (button_payload === ScrollingKeyboardCallback.SELECT_PAGE) {
             ctx.callback!.payload = undefined
 
@@ -106,10 +125,10 @@ export let SupportsList: IState<InitParams> = {
             )
         }
 
-        ctx.metadata.supportsList.reply_url = await sendOrEditMessage(
+        await sendOrEditMessage(
             ctx,
             {
-                message_id: ctx.metadata.supportsList.reply_url,
+                message_id: ctx.currentState?.state_id == SupportsList.state_id ? ctx.message?.body.mid : undefined,
                 text: format(lang.SUPPORTS.SELECT_SUPPORT_FROM_LIST, {
                     total_supports: ctx.metadata.supportsList.total_supports,
                 }),
@@ -124,11 +143,12 @@ export let SupportsList: IState<InitParams> = {
         return SupportsList
     },
 
-    async init(ctx, args) {
-        ctx.metadata.supportsList = {}
-        ctx.metadata.supportsList.supports = args.supports ?? []
-        ctx.metadata.supportsList.current_page = args.startPage ?? 0
-        ctx.metadata.supportsList.reply_url = null
+    async init(ctx: BetterContext<Metadata>, args) {
+        ctx.metadata.supportsList = {
+            supports: args.supports ?? [],
+            total_supports: (args.supports ?? []).length,
+            current_page: args.startPage ?? 0,
+        }
 
         ctx.metadata.supportsList.total_supports = ctx.metadata.supportsList.supports.length
         return SupportsList
@@ -140,13 +160,11 @@ export let SupportsList: IState<InitParams> = {
 
     async fromSelector(ctx: BetterContext, value: number) {
         ctx.metadata.supportsList.current_page = value - 1
-        ctx.metadata.supportsList.reply_url = null
 
         return this.process_state(ctx)
     },
 
-    async fromSelectorCancel(ctx: BetterContext) {
-        ctx.metadata.supportsList.reply_url = null
+    async fromSelectorCancel(ctx: BetterContext<Metadata>) {
         return await this.process_state(ctx)
     },
 }

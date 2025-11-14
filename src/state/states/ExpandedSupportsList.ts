@@ -26,7 +26,6 @@ interface Metadata {
         current_page: number,
         total_supports: number,
         support?: Support,
-        reply_url?: string,
     }
 }
 
@@ -43,7 +42,7 @@ export let ExpandedSupportsList: IState<InitParams> = {
     state_id: "expanded_supports_list",
     active_on: "all",
     async process_state(ctx: BetterContext<Metadata>) {
-        const supports = ctx.metadata.expandedSupportsList.supports as Support[]
+        const supports = ctx.metadata.expandedSupportsList.supports
         const button_payload = ctx.callback?.payload
 
         let page = clamp(ctx.metadata.expandedSupportsList.current_page, 0, ctx.metadata.expandedSupportsList.total_supports)
@@ -66,8 +65,6 @@ export let ExpandedSupportsList: IState<InitParams> = {
 
                 return ErrorOccured.process_state(ctx)
             }
-
-            delete ctx.metadata.expandedSupportsList.reply_url
 
             SupportInfo.init!(ctx, {
                 support: support,
@@ -133,10 +130,10 @@ export let ExpandedSupportsList: IState<InitParams> = {
             )
         }
 
-        ctx.metadata.expandedSupportsList.reply_url = await sendOrEdit(
+        await sendOrEdit(
             ctx,
             {
-                message_id: ctx.metadata.expandedSupportsList.reply_url,
+                message_id: ctx.currentState?.state_id == ExpandedSupportsList.state_id ? ctx.message?.body.mid : undefined,
                 text: format(lang.SUPPORTS.EXPANDED_TEXT, {
                     name: support.full_name,
                     description: support.description,
@@ -171,12 +168,10 @@ export let ExpandedSupportsList: IState<InitParams> = {
 
     async fromSelector(ctx: BetterContext<Metadata>, value: number) {
         ctx.metadata.expandedSupportsList.current_page = value - 1
-        ctx.metadata.expandedSupportsList.reply_url = undefined
         return this.process_state(ctx)
     },
 
     async fromSelectorCancel(ctx: BetterContext<Metadata>) {
-        ctx.metadata.expandedSupportsList.reply_url = undefined
         return await this.process_state(ctx)
     },
 }

@@ -6,6 +6,7 @@ import { getSupport } from "@/services/api";
 import format from "@/utils/format";
 import { SupportsList } from "./SupportsList"
 import BetterContext from "@/BetterContext";
+import { get_state_from_id } from "../state_managing";
 
 interface InitParams {
     support: Support,
@@ -24,14 +25,22 @@ interface Metadata {
 let state: IState<InitParams> = {
     state_id: "support_info",
     active_on: "all",
-    async process_state(ctx) {
+    async process_state(ctx: BetterContext<Metadata>) {
         if (ctx.callback?.payload == "back") {
             ctx.callback.payload = undefined
+            const nextState = get_state_from_id(ctx.metadata.supportInfo.nextStateId)!
+            const nextStateInit = ctx.metadata.supportInfo.passToNextStateInit
 
-            return await SupportsList.process_state(ctx)
+            let newState = nextState
+
+            if (nextStateInit) {
+                newState = await nextState.init!(ctx, nextStateInit)
+            }
+
+            return await newState.process_state(ctx)
         }
 
-        const support_id = (ctx.metadata.support as Support).id!
+        const support_id = ctx.metadata.supportInfo.support.id!
 
         const support = (await getSupport(support_id)).data!
 
@@ -43,7 +52,7 @@ let state: IState<InitParams> = {
             "organizations": "- " + support.organizations!.map((val) => `[${val.name}](${val.link})`).join("\n- ")
         })
 
-        ctx.reply(result_text, {
+        await ctx.reply(result_text, {
             attachments: [
                 Keyboard.inlineKeyboard([
                     support.provide_url ? [Keyboard.button.link(support.provide_text!, support.provide_url)] : [],
