@@ -42,6 +42,7 @@ export function createScrollingKeyboard(values: {id: string, value: string}[], p
         scrollLeftNotAllowedText,
         scrollRightNotAllowedText,
 
+        firstAdditionalButton,
         additionalButtons,
 
         valuesPerPage,
@@ -59,6 +60,7 @@ export function createScrollingKeyboard(values: {id: string, value: string}[], p
         scrollRightText: "->",
         scrollRightNotAllowedText: "🚫",
 
+        firstAdditionalButton: [],
         additionalButtons: [],
         valuesPerPage: 5,
 
@@ -89,6 +91,7 @@ export function createScrollingKeyboard(values: {id: string, value: string}[], p
             }
             return [Keyboard.button.callback(val.value.slice(0, 128), val.id)]
         }),
+        ...firstAdditionalButton,
         hideControlsIfNotEnough && values.length <= valuesPerPage ?
         [] :
         [
