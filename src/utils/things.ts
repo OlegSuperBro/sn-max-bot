@@ -22,3 +22,11 @@ export function getWordEnding(num: number): Ending {
 
     return Ending.NONE
 }
+
+export async function sleep(ms: number): Promise<void> {
+    return new Promise((res) => {
+        setTimeout(() => {
+            res()
+        }, ms)
+    })
+}
