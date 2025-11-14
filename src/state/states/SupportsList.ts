@@ -100,7 +100,9 @@ export let SupportsList: IState<InitParams> = {
                     ],
 
                     valuesPerPage: SUPPORTS_PER_PAGE,
-                }
+
+                    hideControlsIfNotEnough: true,
+                },
             )
         }
 

@@ -26,6 +26,8 @@ interface createScrollingKeyboardOptions {
 
     valuesPerPage?: number,
     showValues?: boolean,
+
+    hideControlsIfNotEnough?: boolean
 }
 
 export function createScrollingKeyboard(values: {id: string, value: string}[], page: number, options?: createScrollingKeyboardOptions) {
@@ -44,6 +46,8 @@ export function createScrollingKeyboard(values: {id: string, value: string}[], p
 
         valuesPerPage,
         showValues,
+
+        hideControlsIfNotEnough,
     }: createScrollingKeyboardOptions = {
         scrollLeftCallback: ScrollingKeyboardCallback.SCROLL_LEFT,
         scrollRightCallback: ScrollingKeyboardCallback.SCROLL_RIGHT,
@@ -59,6 +63,8 @@ export function createScrollingKeyboard(values: {id: string, value: string}[], p
         valuesPerPage: 5,
 
         showValues: true,
+
+        hideControlsIfNotEnough: false,
 
         ...options,
     }
@@ -83,6 +89,8 @@ export function createScrollingKeyboard(values: {id: string, value: string}[], p
             }
             return [Keyboard.button.callback(val.value.slice(0, 128), val.id)]
         }),
+        hideControlsIfNotEnough && values.length <= valuesPerPage ?
+        [] :
         [
             Keyboard.button.callback(page <= 0 ? scrollLeftNotAllowedText : scrollLeftText, scrollLeftCallback),
             Keyboard.button.callback(`${page + 1}/${totalPages}`, selectPageCallback),

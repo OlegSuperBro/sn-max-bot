@@ -126,6 +126,8 @@ export let ExpandedSupportsList: IState<InitParams> = {
                     ],
                     valuesPerPage: 1,
                     showValues: false,
+
+                    hideControlsIfNotEnough: true,
                 }
 
             )
