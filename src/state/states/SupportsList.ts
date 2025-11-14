@@ -114,6 +114,7 @@ export let SupportsList: IState<InitParams> = {
                 page,
                 {
                     additionalButtons: [
+                        [Keyboard.button.callback(lang.SEPARATOR, "none")],
                         [Keyboard.button.callback(lang.SUPPORTS.SWITCH_TO_EXTENDED, payloads.SWITCH_TO_EXPANDED)],
                         [Keyboard.button.callback(lang.GO_BACK, payloads.BACK_HOME)]
                     ],

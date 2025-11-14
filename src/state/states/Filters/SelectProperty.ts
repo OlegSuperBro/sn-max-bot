@@ -106,6 +106,7 @@ export let selectFilterSectionProperty: IState<InitParams> = {
                 page,
                 {
                     additionalButtons: [
+                        [Keyboard.button.callback(lang.SEPARATOR, "none")],
                         [Keyboard.button.callback(lang.GO_BACK, payloads.BACK)]
                     ],
                     valuesPerPage: PROPERTIES_PER_PAGE

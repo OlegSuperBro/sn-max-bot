@@ -120,6 +120,7 @@ export let SelectFilterSection: IState<InitParams> = {
                 page,
                 {
                     additionalButtons: [
+                        [Keyboard.button.callback(lang.SEPARATOR, "none")],
                         [
                             Keyboard.button.callback(
                                 lang.FILTER.RESET_ALL_BUTTON,

@@ -200,9 +200,9 @@ export let PropertyQuality: IState<InitParams> = {
                             `${payloads.OPTION}${x.id}`
                         )
                     }),
-                    [
-                        Keyboard.button.callback(lang.GO_BACK, payloads.BACK),
-                    ],
+                    [Keyboard.button.callback(lang.SEPARATOR, 'none')],
+
+                    [Keyboard.button.callback(lang.GO_BACK, payloads.BACK)],
                     [
                         Keyboard.button.callback(
                             lang.FILTER.DELETE_ALL_VALUES,
@@ -220,9 +220,9 @@ export let PropertyQuality: IState<InitParams> = {
                             ),
                         ]
                     }),
-                    [
-                        Keyboard.button.callback(lang.GO_BACK, payloads.BACK),
-                    ],
+                    [Keyboard.button.callback(lang.SEPARATOR, 'none')],
+
+                    [Keyboard.button.callback(lang.GO_BACK, payloads.BACK)],
                     [
                         Keyboard.button.callback(
                             lang.FILTER.DELETE_ALL_VALUES,
@@ -241,18 +241,19 @@ export let PropertyQuality: IState<InitParams> = {
                     page,
                     {
                         additionalButtons: [
+                            [Keyboard.button.callback(lang.SEPARATOR, "none")],
                             [
                                 Keyboard.button.callback(
                                     lang.GO_BACK,
                                     payloads.BACK
-                                )
+                                ),
                             ],
                             [
                                 Keyboard.button.callback(
                                     lang.FILTER.DELETE_ALL_VALUES,
                                     payloads.DELETE
                                 ),
-                            ]
+                            ],
                         ],
                         valuesPerPage: VALUES_PER_PAGE,
                     }

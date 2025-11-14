@@ -118,6 +118,7 @@ export let ExpandedSupportsList: IState<InitParams> = {
                         [Keyboard.button.link(lang.SUPPORTS.OPEN_ON_SITE, `https://sn.stavregion.ru/support/${support.id}`)],
                     ],
                     additionalButtons: [
+                        [Keyboard.button.callback(lang.SEPARATOR, "none")],
                         [Keyboard.button.callback(lang.SUPPORTS.SWITCH_TO_COMPACT, payloads.SWITCH_TO_COMPACT)],
                         [Keyboard.button.callback(lang.GO_BACK, payloads.BACK_HOME)]
                     ],
