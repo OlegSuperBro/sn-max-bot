@@ -95,7 +95,7 @@ export let NumberSelector: IState<InitParams> = {
         const input_value = Number(ctx.message?.body.text)
 
         if (waiting && input_value) {
-            if (input_value < (selector_min ?? Infinity) || input_value > (selector_max ?? Infinity)) {
+            if (input_value < (selector_min ?? -Infinity) || input_value > (selector_max ?? Infinity)) {
                 await ctx.reply(
                     format(lang.NUMBER_SELECTOR.WRONG_MESSAGE, {
                         range: getRangeText(selector_min, selector_max),
