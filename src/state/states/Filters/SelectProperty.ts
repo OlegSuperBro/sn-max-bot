@@ -115,11 +115,14 @@ export let selectFilterSectionProperty: IState<InitParams> = {
 
         await sendOrEdit(ctx, {
             message_id: ctx.currentState?.state_id == selectFilterSectionProperty.state_id ? ctx.message?.body.mid : undefined,
-            text: "test",
+            text: format(lang.FILTER.SELECT_PROPERTY, {
+                section_name: section.name
+            }),
             extra: {
                 attachments: [
                     create_keyboard()
-                ]
+                ],
+                format: "markdown"
             }
         })
 

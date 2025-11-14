@@ -117,9 +117,10 @@ export let SelectFilterSection: IState<InitParams> = {
                 ctx.currentState?.state_id == SelectFilterSection.state_id
                     ? ctx.message?.body.mid
                     : undefined,
-            text: 'test',
+            text: lang.FILTER.SELECT_SECTION,
             extra: {
                 attachments: [create_keyboard()],
+                format: "markdown",
             },
         })
 
