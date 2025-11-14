@@ -177,16 +177,33 @@ export let PropertyQuality: IState<InitParams> = {
 
         // TODO hide "delete value" only if value in portrait
         function create_keyboard() {
+            function getPropertyName(x: QualityProperty) {
+                return ctx.userData.portrait
+                    .getValue({
+                        type: 'q',
+                        property: qualityPropertyType,
+                    })
+                    ?.includes(x.id)
+                    ? format(lang.FILTER.SECTION_DONE, {
+                          name: x.name,
+                      })
+                    : format(lang.FILTER.SECTION_NOT_DONE, {
+                          name: x.name,
+                      })
+            }
+
             if (qualityPropertyType.qualityProperties.length <= 2) {
                 return Keyboard.inlineKeyboard([
                     qualityPropertyType.qualityProperties.map((x) => {
                         return Keyboard.button.callback(
-                            `${x.name}`,
+                            getPropertyName(x),
                             `${payloads.OPTION}${x.id}`
                         )
                     }),
                     [
                         Keyboard.button.callback(lang.GO_BACK, payloads.BACK),
+                    ],
+                    [
                         Keyboard.button.callback(
                             lang.FILTER.DELETE_ALL_VALUES,
                             payloads.DELETE
@@ -198,13 +215,15 @@ export let PropertyQuality: IState<InitParams> = {
                     ...qualityPropertyType.qualityProperties.map((x) => {
                         return [
                             Keyboard.button.callback(
-                                `${x.name}`,
+                                getPropertyName(x),
                                 `${payloads.OPTION}${x.id}`
                             ),
                         ]
                     }),
                     [
                         Keyboard.button.callback(lang.GO_BACK, payloads.BACK),
+                    ],
+                    [
                         Keyboard.button.callback(
                             lang.FILTER.DELETE_ALL_VALUES,
                             payloads.DELETE
@@ -216,18 +235,7 @@ export let PropertyQuality: IState<InitParams> = {
                     qualityPropertyType.qualityProperties.map((x) => {
                         return {
                             id: `${payloads.OPTION}${x.id}`,
-                            value: ctx.userData.portrait
-                                .getValue({
-                                    type: 'q',
-                                    property: qualityPropertyType,
-                                })
-                                ?.includes(x.id)
-                                ? format(lang.FILTER.SECTION_DONE, {
-                                      name: x.name,
-                                  })
-                                : format(lang.FILTER.SECTION_NOT_DONE, {
-                                      name: x.name,
-                                  }),
+                            value: getPropertyName(x),
                         }
                     }),
                     page,
@@ -237,12 +245,14 @@ export let PropertyQuality: IState<InitParams> = {
                                 Keyboard.button.callback(
                                     lang.GO_BACK,
                                     payloads.BACK
-                                ),
+                                )
+                            ],
+                            [
                                 Keyboard.button.callback(
                                     lang.FILTER.DELETE_ALL_VALUES,
                                     payloads.DELETE
                                 ),
-                            ],
+                            ]
                         ],
                         valuesPerPage: VALUES_PER_PAGE,
                     }
