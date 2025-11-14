@@ -56,6 +56,7 @@ let state: IState<InitParams> = {
             attachments: [
                 Keyboard.inlineKeyboard([
                     support.provide_url ? [Keyboard.button.link(support.provide_text!, support.provide_url)] : [],
+                    [Keyboard.button.link(lang.SUPPORTS.OPEN_ON_SITE, `https://sn.stavregion.ru/support/${support.id}`)],
                     [Keyboard.button.callback(lang.GO_BACK, "back")]
                 ])
             ],
