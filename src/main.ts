@@ -94,6 +94,21 @@ async function run() {
         await next()
     })
 
+    let isShuttingDown = false;
+
+    const gracefulShutdown = async () => {
+        if (isShuttingDown) return;
+        isShuttingDown = true;
+
+        console.log('Shutting down gracefully...');
+        await bot.stop();
+        process.exit(0);
+    };
+
+    // Handle signals
+    process.on('SIGTERM', gracefulShutdown);
+    process.on('SIGINT', gracefulShutdown);
+
     loop(bot)
 }
 
