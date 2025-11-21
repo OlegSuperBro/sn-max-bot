@@ -3,7 +3,9 @@ import { createClient, RedisClientType } from 'redis';
 
 let client: RedisClientType | null = null
 
-async function get_create_connection(url: string = 'redis://localhost:6379') {
+const REDIS_URL = process.env["REDIS_URL"] ?? 'redis://localhost:6379'
+
+async function get_create_connection(url: string = REDIS_URL) {
     if (client) {
         return client
     }
