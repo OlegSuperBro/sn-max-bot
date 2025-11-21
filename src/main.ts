@@ -8,8 +8,9 @@ import userDataMiddleware from './middleware/user_data';
 import processState from './state/DefaultStateMachine';
 
 import lang from '@/strings/ru.json'
-import { reset_state } from './state/state_managing';
+import { delete_all_user_info, reset_state } from './state/state_managing';
 
+const isDebug = process.env["NODE_ENV"] == "development"
 
 
 const bot = new Bot(process.env["BOT_TOKEN"]!, {
@@ -66,21 +67,23 @@ async function run() {
         "message_chat_created"
     ], async (ctx, next) => {
         if (ctx.updateType == "bot_started") {
-            console.debug(`BOT STARTED. SETTING NULL STATE`)
-            ctx.currentState = null
+            if (isDebug) console.debug(`BOT STARTED. SETTING NULL STATE`);
+
+            await delete_all_user_info(ctx.user!.user_id.toString())
         }
 
-        if (ctx.message?.body.text == "reset") {
+        if (isDebug && ctx.message?.body.text == "reset") {
             console.debug(`GOT RESET COMMAND. RESETING STATE`)
             ctx.currentState = null
             await ctx.reply("RESET")
         }
 
         if (!ctx.currentState) {
-            console.debug(`NO CURRENT STATE. RESETING`)
+            if (isDebug) console.debug(`NO CURRENT STATE. RESETING`);
+
             ctx.currentState = await reset_state(ctx.user!.user_id.toString())
         }
-        console.debug(`GOT ${ctx.updateType}. TEXT: ${ctx.message?.body.text}. CURRENT STAGE: ${ctx.currentState.state_id} TIMESTAMP: ${ctx.message?.timestamp}`)
+        if (isDebug) console.debug(`GOT ${ctx.updateType}. TEXT: ${ctx.message?.body.text}. CURRENT STAGE: ${ctx.currentState.state_id} TIMESTAMP: ${ctx.message?.timestamp}`)
         try {
             await processState(ctx, ctx.currentState!)
         } catch (e) {

@@ -81,3 +81,11 @@ export async function get_metadata(user_id: string): Promise<any> {
 
     return data ? JSON.parse(data) : {}
 }
+
+export async function delete_all_user_info(user_id: string): Promise<void> {
+    const redis = await get_redis()
+
+    await reset_metadata(user_id)
+    await reset_state(user_id)
+    await redis.del(`user_portrait:${user_id}`)
+}
