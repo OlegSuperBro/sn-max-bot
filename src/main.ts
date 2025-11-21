@@ -70,6 +70,7 @@ async function run() {
             if (isDebug) console.debug(`BOT STARTED. SETTING NULL STATE`);
 
             await delete_all_user_info(ctx.user!.user_id.toString())
+            ctx.currentState = null
         }
 
         if (isDebug && ctx.message?.body.text == "reset") {
