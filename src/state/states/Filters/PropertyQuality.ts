@@ -313,6 +313,12 @@ export let PropertyQuality: IState<InitParams> = {
         const qualityPropertyType = ctx.metadata.propertyQuality.propertyType
         const qProperty = ctx.metadata.propertyQuality.selectedProperty!
 
+        const next_state = get_state_from_id(
+            ctx.metadata.propertyQuality.nextStateId
+        )!
+        const next_state_init_params =
+            ctx.metadata.propertyQuality.nextStateInitParams
+
         if (qualityPropertyType.filterFieldCode === 'multiselect') {
             ctx.callback!.payload = undefined
 
@@ -351,7 +357,14 @@ export let PropertyQuality: IState<InitParams> = {
             },
             qProperty
         )
-        return await selectFilterSectionProperty.process_state(ctx)
+
+        let new_state = next_state
+
+        if (next_state_init_params) {
+            new_state = await next_state.init!(ctx, next_state_init_params)
+        }
+
+        return await new_state.process_state(ctx)
     },
 
     async abort(ctx: BetterContext<Metadata>) {
