@@ -1,5 +1,6 @@
 import { exit } from 'process';
 import { createClient, RedisClientType } from 'redis';
+import { redisLog } from './LogConfig';
 
 let client: RedisClientType | null = null
 
@@ -15,12 +16,12 @@ async function get_create_connection(url: string = REDIS_URL) {
     });
 
     client.on('error', (err) => {
-        console.error('Redis Client Error', err);
+        redisLog.error('Redis Client Error', err);
         exit(1);
     });
 
     await client.connect();
-    console.info('Connected to Redis');
+    redisLog.info('Connected to Redis');
 
     return client
 }

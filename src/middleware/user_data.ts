@@ -3,11 +3,14 @@
  */
 
 import BetterContext, { Portrait } from "@/BetterContext";
+import { middlewareLog } from "@/LogConfig";
 import get_redis from "@/redis"
+
+const log = middlewareLog.getChildCategory("USER_DATA")
 
 export default async function metadataMiddleware(ctx: BetterContext, next: () => Promise<void>) {
     if (!ctx.user) {
-        console.error(`USER DON'T EXIST\n${ctx}`)
+        log.error(`USER DON'T EXIST\n${ctx}`)
         return
     }
 

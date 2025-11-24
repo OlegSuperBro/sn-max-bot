@@ -1,3 +1,4 @@
+import { stateLog } from "@/LogConfig";
 import { Keyboard } from "@maxhub/max-bot-api";
 import { Button, CallbackButton } from "@maxhub/max-bot-api/types";
 
@@ -85,9 +86,7 @@ export function createScrollingKeyboard(values: {id: string, value: string}[], p
     return Keyboard.inlineKeyboard([
         ...filtered_values.map((val) => {
             if (val.value.length >= 128) {
-                if (isDebug) {
-                    console.warn(`Value with id=${val.id} is too long (${val.value.length}). Slicing it...`)
-                }
+                stateLog.warn(`Value with id=${val.id} is too long (${val.value.length}). It will be sliced`)
             }
             return [Keyboard.button.callback(val.value.slice(0, 128), val.id)]
         }),

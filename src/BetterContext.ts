@@ -5,6 +5,9 @@ import { NumericalProperty, QualityProperty, QualityPropertyType, Support } from
 import get_redis from "./redis";
 import { getFilterLayout, getSupports } from "./services/api";
 import { FilterProperty, FilterSection } from "./typings/filter";
+import { getLogger } from "./LogConfig";
+
+const logger = getLogger("CACHE")
 
 class GlobalCache {
     private _supports: Support[] = [];
@@ -17,6 +20,7 @@ class GlobalCache {
             if (supports) {
                 this._supports = JSON.parse(supports)
             } else {
+                logger.info("No cache for supports found. Fetching new supports");
                 let {
                     data,
                     status
@@ -59,7 +63,9 @@ class GlobalCache {
                         }
                     })
                     this._supports = supports
+                    logger.info(`Update successfully. Supports cache expires at ${new Date((Date.now() + (60 * 60 * 12 * 1000))).toDateString()}`)
                 } else {
+                    logger.error(`Invalid response status from supports request: ${status}`)
                     throw new Error(`Invalid status: ${status}`)
                 }
             }
@@ -78,6 +84,7 @@ class GlobalCache {
             if (layout) {
                 this._filterLayout = JSON.parse(layout)
             } else {
+                logger.info("No cache for filter layout found. Fetching new layout");
                 let {
                     data,
                     status
@@ -93,7 +100,9 @@ class GlobalCache {
                         }
                     })
                     this._filterLayout = layout
+                    logger.info(`Update successfully. Layout cache expires at ${new Date((Date.now() + (60 * 60 * 24 * 7 * 1000))).toDateString()}`)
                 } else {
+                    logger.error(`Invalid response status from filter layout request: ${status}`)
                     throw new Error(`Invalid status: ${status}`)
                 }
             }

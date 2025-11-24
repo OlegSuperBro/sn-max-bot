@@ -9,6 +9,7 @@ import processState from './state/DefaultStateMachine';
 
 import lang from '@/strings/ru.json'
 import { delete_all_user_info, reset_state } from './state/state_managing';
+import { botLog } from './LogConfig';
 
 const isDebug = process.env["NODE_ENV"] == "development"
 
@@ -20,6 +21,12 @@ const bot = new Bot(process.env["BOT_TOKEN"]!, {
         baseUrl: "https://platform-api.max.ru"
     }
 });
+
+const messageLog = botLog.getChildCategory("MESSAGES")
+
+function logMessage(ctx: BetterContext) {
+    messageLog.debug(`GOT ${ctx.updateType}. TEXT: ${ctx.message?.body.text}. TIMESTAMP: ${ctx.message?.timestamp}`, ctx)
+}
 
 async function run_backup() {
     bot.on([
@@ -40,7 +47,7 @@ async function run_backup() {
         ctx.reply(lang.STUB_MESSAGE)
     })
     let bot_promise = bot.start();
-    console.info("BOT READY IN BACKUP MODE")
+    botLog.info("BOT READY IN BACKUP MODE")
 
     await bot_promise;
 }
@@ -67,29 +74,29 @@ async function run() {
         "message_chat_created"
     ], async (ctx, next) => {
         if (ctx.updateType == "bot_started") {
-            if (isDebug) console.debug(`BOT STARTED. SETTING NULL STATE`);
+            botLog.debug(`BOT STARTED. SETTING NULL STATE`);
 
             await delete_all_user_info(ctx.user!.user_id.toString())
             ctx.currentState = null
         }
 
         if (isDebug && ctx.message?.body.text == "reset") {
-            console.debug(`GOT RESET COMMAND. RESETING STATE`)
+            botLog.debug(`GOT RESET COMMAND. RESETING STATE`)
             ctx.currentState = null
             await ctx.reply("RESET")
         }
 
         if (!ctx.currentState) {
-            if (isDebug) console.debug(`NO CURRENT STATE. RESETING`);
+            botLog.debug(`NO CURRENT STATE. RESETING`);
 
             ctx.currentState = await reset_state(ctx.user!.user_id.toString())
         }
-        if (isDebug) console.debug(`GOT ${ctx.updateType}. TEXT: ${ctx.message?.body.text}. CURRENT STAGE: ${ctx.currentState.state_id} TIMESTAMP: ${ctx.message?.timestamp}`)
+        logMessage(ctx)
         try {
             await processState(ctx, ctx.currentState!)
         } catch (e) {
             await ctx.reply(lang.ERROR.INTERNAL_ERROR)
-            console.error(e)
+            botLog.error(`Error occured:`, e)
         }
         await next()
     })
@@ -100,7 +107,7 @@ async function run() {
         if (isShuttingDown) return;
         isShuttingDown = true;
 
-        console.log('Shutting down gracefully...');
+        botLog.info('Shutting down gracefully...');
         await bot.stop();
         process.exit(0);
     };
@@ -114,15 +121,16 @@ async function run() {
 
 async function loop(bot: Bot<BetterContext>) {
     bot.start().catch((r) => {
-        console.warn("BOT CRASHED")
-        console.error(r)
+        botLog.warn("BOT CRASHED")
+        botLog.warn(r)
         bot.stop()
 
+        botLog.info("Restarting in 500 milliseconds")
         setTimeout(() => {
             loop(bot)
         }, 500)
     })
-    console.info("BOT STARTED");
+    botLog.info("BOT STARTED");
 }
 
 if (process.env.BOT_STATE === "backup") {

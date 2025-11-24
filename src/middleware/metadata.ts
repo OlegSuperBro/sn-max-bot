@@ -3,11 +3,14 @@
  */
 
 import BetterContext from "@/BetterContext";
+import { middlewareLog } from "@/LogConfig";
 import { get_metadata } from "@/state/state_managing";
+
+const log = middlewareLog.getChildCategory("METADATA")
 
 export default async function metadataMiddleware(ctx: BetterContext, next: () => Promise<void>) {
     if (!ctx.user) {
-        console.error(`USER DON'T EXIST\n${ctx}`)
+        log.error(`USER DON'T EXIST\n${ctx}`)
         return
     }
 
