@@ -96,7 +96,8 @@ async function run() {
             await processState(ctx, ctx.currentState!)
         } catch (e) {
             await ctx.reply(lang.ERROR.INTERNAL_ERROR)
-            botLog.error(`Error occured:`, e)
+            botLog.error(`Error occured:\n${(e as Error).stack}`,)
+            botLog.debug(`Metadata dump: ${JSON.stringify(ctx.metadata)}`)
         }
         await next()
     })
