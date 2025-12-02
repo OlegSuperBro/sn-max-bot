@@ -121,9 +121,9 @@ async function run() {
 }
 
 async function loop(bot: Bot<BetterContext>) {
-    bot.start().catch((r) => {
+    bot.start().catch((r: Error) => {
         botLog.warn("BOT CRASHED")
-        botLog.warn(r)
+        botLog.warn(`${r}`)
         bot.stop()
 
         botLog.info("Restarting in 500 milliseconds")
