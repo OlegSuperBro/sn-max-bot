@@ -22,7 +22,7 @@
   "scripts": {
     "build": "node build.js",
     "start": "node dist/main.js",
-    "dev": "npx tsx watch src/main.ts"
+    "dev": "npx tsx watch --env-file-if-exists=.env src/main.ts"
   },
   "author": "",
   "license": "MIT",
