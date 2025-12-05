@@ -1,9 +1,9 @@
 import { DefaultChannels, LogLevel } from "typescript-logging";
 import {CategoryProvider, Category} from "typescript-logging-category-style";
 import BetterContext from "./BetterContext";
-import { access, constants, FileHandle, mkdir, open } from "fs/promises";
+import { access, constants, mkdir } from "fs/promises";
 
-import { type WriteStream as fsWriteStream } from "fs";
+import { type WriteStream as fsWriteStream, createWriteStream } from "fs";
 import { type WriteStream as ttyWriteStream } from "tty";
 
 const DEBUG = process.env["NODE_ENV"] == "development"
@@ -14,12 +14,19 @@ const ALWAYS_WRITE_TO_TTY = true
 const FILE_TIMEOUT = 1000 * 60 * 60 * 12
 
 /// Timestamp
-let fileOpened: number = 0;
-let file: FileHandle | null;
+let promiseGetFileStream: Promise<fsWriteStream | ttyWriteStream> | null = null
 
-let writeStream: fsWriteStream | ttyWriteStream
+let writeStreamOpened: number = 0;
+let writeStream: fsWriteStream | ttyWriteStream | null
 
-async function getFileSream() {
+function getFileStream() {
+    if (!promiseGetFileStream) {
+        promiseGetFileStream = _getFileStream()
+    }
+    return promiseGetFileStream
+}
+
+async function _getFileStream() {
     try {
         await access("logs", constants.W_OK);
     } catch (error) {
@@ -40,12 +47,15 @@ async function getFileSream() {
         }
     }
 
-    if (file && (fileOpened + FILE_TIMEOUT < Date.now())) {
-        await file.close()
-        file = null
+    if (writeStream && (writeStreamOpened + FILE_TIMEOUT < Date.now())) {
+        if (writeStream && !writeStream.destroyed) {
+            writeStream.end()
+            writeStream.destroy()
+            writeStream = null
+        }
     }
 
-    if (!file) {
+    if (!writeStream) {
         const date = new Date()
         const dateStr = `${date.getFullYear().toString().padStart(2, "0")}-${(date.getMonth() + 1).toString().padStart(2, "0")}-${date.getDate().toString().padStart(2, "0")}`;
 
@@ -63,14 +73,19 @@ async function getFileSream() {
             }
         }
 
-        file = await open(`logs/${dateStr}_${num}.log`, 'a')
-        fileOpened = Date.now()
-
-        writeStream = file.createWriteStream()
+        writeStreamOpened = Date.now()
+        writeStream = createWriteStream(`logs/${dateStr}_${num}.log`, {flags: 'a'})
     }
 
     return writeStream
 }
+
+process.on('beforeExit', async () => {
+    if (writeStream && !writeStream.destroyed) {
+        writeStream.end();
+        await new Promise(resolve => setTimeout(resolve, 100));
+    }
+});
 
 
 const mainProvider = CategoryProvider.createProvider("main", {
@@ -98,7 +113,7 @@ const mainProvider = CategoryProvider.createProvider("main", {
             }
 
             if (!DEBUG) {
-                const stream = await getFileSream()
+                const stream = await getFileStream()
                 stream.write(message + "\n")
             }
             if (DEBUG || ALWAYS_WRITE_TO_TTY){
